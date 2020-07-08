@@ -5,12 +5,12 @@ CONFIG_FILE=$FLYWHEEL_BASE/config.json
 ANALYSIS_ID=$(jq -r '.destination.id' $CONFIG_FILE)
 INPUT_DIR=$FLYWHEEL_BASE/input
 GEAR_OUTPUT_DIR=$FLYWHEEL_BASE/output
-FMRIPREP_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"
+ASLPREP_OUTPUT_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"
 WORKING_DIR=$GEAR_OUTPUT_DIR/"$ANALYSIS_ID"_work
 FREESURFER_LICENSE_DIR=$INPUT_DIR/freesurfer_license
 BIDS_DIR=$GEAR_OUTPUT_DIR/bids_dataset
-CONTAINER='[flywheel/fmriprep]'
-EXE_SCRIPT=$GEAR_OUTPUT_DIR/fmriprep_run.sh
+CONTAINER='[flywheel/aslprep]'
+EXE_SCRIPT=$GEAR_OUTPUT_DIR/aslprep_run.sh
 
 # CRITICAL: re-create the environment
 cat ${FLYWHEEL_BASE}/docker-env.sh
@@ -36,32 +36,32 @@ config_intermediate_folders="$(parse_config 'intermediate_folders')"
 config_timeout_days="$(parse_config 'timeout')"
 timeout_days=${config_timeout_days%.*}
 
-echo -e "$CONTAINER BEGIN FMRIPREP DOCKERFILE\n"
+echo -e "$CONTAINER BEGIN ASLPREP DOCKERFILE\n"
 cat ${FLYWHEEL_BASE}/*Dockerfile
-echo -e "$CONTAINER END FMRIPREP DOCKERFILE \n"
+echo -e "$CONTAINER END ASLPREP DOCKERFILE \n"
 
 # Download BIDS data and write a command
 timeout 30m /usr/local/miniconda/bin/python /flywheel/v0/prepare_run.py
 
 if [[ ! -f $EXE_SCRIPT ]]; then
-  echo "$CONTAINER Unable to create QSIPrep run environment! Exiting"
+  echo "$CONTAINER Unable to create ASLPREP run environment! Exiting"
   exit 1
 fi
 
 # RUN QSIPREP
 export NODE_OPTIONS="--max-old-space-size=6000"
-timeout ${timeout_days}d bash /flywheel/v0/output/fmriprep_run.sh
+timeout ${timeout_days}d bash /flywheel/v0/output/aslprep_run.sh
 
-FMRIPREP_EXITSTATUS=$?
+ASLPREP_EXITSTATUS=$?
 
-rm -rf ${FMRIPREP_OUTPUT_DIR}/bids_dataset
+rm -rf ${ASLPREP_OUTPUT_DIR}/bids_dataset
 
-if [[ $FMRIPREP_EXITSTATUS == 0 ]] ; then
+if [[ $ASLPREP_EXITSTATUS == 0 ]] ; then
 
   # Convert index to standalone zip archive
-  html_file=$(find "$FMRIPREP_OUTPUT_DIR"/fmriprep/ -name "sub-*.html")
+  html_file=$(find "$ASLPREP_OUTPUT_DIR"/aslprep/ -name "sub-*.html")
   SUB_ID=$(basename "$html_file" .html)
-  SES_PATH=$(find "$FMRIPREP_OUTPUT_DIR"/fmriprep/ -type d -iname "ses*")
+  SES_PATH=$(find "$ASLPREP_OUTPUT_DIR"/aslprep/ -type d -iname "ses*")
   SES_ID=$(basename "$SES_PATH")
 
   if [[ -n "$html_file" ]]; then
@@ -73,7 +73,7 @@ if [[ $FMRIPREP_EXITSTATUS == 0 ]] ; then
         index.html \
         "$SUB_ID"/figures \
         "$SUB_ID"/"$SES_ID"/figures \
-        "$WORKING_DIR"/reportlets/qsiprep/"$SUB_ID" && \
+        "$WORKING_DIR"/reportlets/aslprep/"$SUB_ID" && \
         rm index.html
     echo "$CONTAINER  HTML report converted."
   else
@@ -81,7 +81,7 @@ if [[ $FMRIPREP_EXITSTATUS == 0 ]] ; then
   fi
 
   # Look for files/folders to preserve from the working DIRECTORY
-  work_file_zip="$GEAR_OUTPUT_DIR"/fmriprep_work_selected_"$SUB_ID"_"$ANALYSIS_ID".zip
+  work_file_zip="$GEAR_OUTPUT_DIR"/aslprep_work_selected_"$SUB_ID"_"$ANALYSIS_ID".zip
   if [[ -n "$config_intermediate_files" ]]; then
     echo "$CONTAINER  Archiving selected intermediate files..."
     cd "$WORKING_DIR"
@@ -98,15 +98,15 @@ if [[ $FMRIPREP_EXITSTATUS == 0 ]] ; then
     done
   fi
 
-  # Generate zipped output of fmriprep
+  # Generate zipped output of aslprep
   cd "$GEAR_OUTPUT_DIR"
   echo "$CONTAINER  generating zip archive from outputs..."
-  time zip -q -r "$GEAR_OUTPUT_DIR"/fmriprep_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$FMRIPREP_OUTPUT_DIR")
+  time zip -q -r "$GEAR_OUTPUT_DIR"/aslprep_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$ASLPREP_OUTPUT_DIR")
 
   if [[ $config_save_intermediate_work == 'true' ]] ; then
     echo "$CONTAINER  generating zip archive from intermediate work files..."
     cd "$GEAR_OUTPUT_DIR"
-    time zip -q -r "$GEAR_OUTPUT_DIR"/fmriprep_work_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
+    time zip -q -r "$GEAR_OUTPUT_DIR"/aslprep_work_"$SUB_ID"_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
   fi
   chmod -R 777 $GEAR_OUTPUT_DIR
 
@@ -123,8 +123,8 @@ if [[ $FMRIPREP_EXITSTATUS == 0 ]] ; then
 elif [[ $config_save_outputs == 'true' ]] ; then
   echo "$CONTAINER  Error occurred. Config 'save_outputs' set to true. Zipping up outputs."
   cd "$GEAR_OUTPUT_DIR"
-  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_fmriprep_"$ANALYSIS_ID"  $(basename "$FMRIPREP_OUTPUT_DIR")
-  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_fmriprep_work_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
+  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_aslprep_"$ANALYSIS_ID"  $(basename "$ASLPREP_OUTPUT_DIR")
+  time zip -q -r "$GEAR_OUTPUT_DIR"/debug_aslprep_work_"$ANALYSIS_ID" $(basename "$WORKING_DIR")
   chmod -R 777 $GEAR_OUTPUT_DIR
 
   ################################################################################
@@ -143,9 +143,9 @@ fi
 
 # Clean up
 rm -rf "$WORKING_DIR"
-rm -rf "$FMRIPREP_OUTPUT_DIR"
+rm -rf "$ASLPREP_OUTPUT_DIR"
 
 
 echo -e "Wrote: `ls -lh $GEAR_OUTPUT_DIR`"
 
-exit $FMRIPREP_EXITSTATUS
+exit $ASLPREP_EXITSTATUS

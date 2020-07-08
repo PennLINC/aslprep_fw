@@ -1,47 +1,26 @@
 {
-  "name": "fmriprep-hpc",
-  "label": "fMRIPREP: A Robust Preprocessing Pipeline for fMRI Data [fw-heudiconv]",
-  "description": "[Powered by fw-heudiconv] fmriprep is a functional magnetic resonance imaging (fMRI) data preprocessing pipeline that is designed to provide an easily accessible, state-of-the-art interface that is robust to variations in scan acquisition protocols and that requires minimal user input, while providing easily interpretable and comprehensive error and output reporting. It performs basic processing steps (coregistration, normalization, unwarping, noise component extraction, segmentation, skullstripping etc.) providing outputs that can be easily submitted to a variety of group level analyses, including task-based or resting-state fMRI, graph theory measures, surface or volume-based statistics, etc.",
-  "author": "Poldrack Lab, Stanford University | Modified for Flywheel by PennBBL, University of Pennsylvania",
-  "cite": "Esteban O, Blair R, Markiewicz CJ, Berleant SL, Moodie C, Ma F, Isik AI, Erramuzpe A, Kent JD, Goncalves M, Poldrack RA, Gorgolewski KJ; poldracklab/fmriprep: 1.0.0-rc9. Zenodo; 2017. doi:10.5281/zenodo.1041020  FOR MORE INFORMATION SEE: http://fmriprep.readthedocs.io/en/stable/citing.html.",
-  "maintainer": "Ted Satterthwaite <sattertt@upenn.edu>",
-  "source": "https://github.com/pennbbl/fmriprep",
-  "url": "https://fmriprep.readthedocs.io/en/20.0.5/",
-  "version": "0.3.4_20.0.5",
+  "name": "aslprep_fw",
+  "label": "ASLPREP: A Robust Preprocessing Pipeline for ASL Data",
+  "description": " ASLPREP is a robust and easy-to-use pipeline for preprocessing of diverse ASLASLP data.",
+  "author": "PennLINC, Stanford University  University of Pennsylvania",
+  "maintainer": "Azeez Adebimpe <adebimpe@upenn.edu>",
+  "source": "https://github.com/pennlinc/aslprep",
+  "url": "https://aslprep.readthedocs.io/en/0.2.3/",
+  "version": "0.0.1_0.2.3",
   "custom": {
     "gear-builder": {
       "category": "analysis",
-      "image": "pennbbl/fmriprep-hpc:0.3.4_20.0.5"
+      "image": "pennlinc/aslprep_fw:0.0_20.0.5"
     },
-    "flywheel":{"suite": "Runs on HPC [Experimental]"}
+    "flywheel":{"suite": "PennBBL"}
   },
   "license": "BSD-3-Clause",
   "inputs": {
     "api_key": {
       "base": "api-key"
     },
-    "t1w_anatomy": {
-      "description": "T1 weighted anatomical NIfTI file. When provided this file will be used in place of any T1w images found in the current session.",
-      "base": "file",
-      "optional": true,
-      "type": {
-        "enum": [
-          "nifti"
-        ]
-      }
-    },
-    "t2w_anatomy": {
-      "description": "T2 weighted anatomical NIfTI file. When provided this file will be used in place of any T2w images found in the current session.",
-      "base": "file",
-      "optional": true,
-      "type": {
-        "enum": [
-          "nifti"
-        ]
-      }
-    },
     "freesurfer_input": {
-      "description": "zip outputs from a BIDS FreeSurfer gear.",
+      "description": "zip outputs from a BIDS FreeSurfer gear. or from fmriprep/qsiprep",
       "base": "file",
       "optional": true,
       "type": {
@@ -123,11 +102,6 @@
       "type": "boolean",
       "default": false
     },
-    "t2s_coreg": {
-      "description": "If provided with multi-echo BOLD dataset, create T2*-map and perform T2*-driven coregistration. When multi-echo data is provided and this option is not enabled, standard EPI-T1 coregistration is performed using the middle echo. [default=false]",
-      "type": "boolean",
-      "default": false
-    },
     "output_spaces": {
       "description": "Standard and non-standard spaces to resample anatomical and functional images to.  Standard spaces may be specified by the form ``<SPACE>[:cohort-<label>][:res-<resolution>][...]``, where ``<SPACE>`` is a keyword designating a spatial reference, and may be followed by optional, colon-separated parameters.  Non-standard spaces imply specific orientations and sampling grids. Important to note, the ``res-*`` modifier does not define the resolution used for the spatial normalization. To generate no BOLD outputs, use this option without specifying any spatial references. For further details, please check out https://fmriprep.readthedocs.io/en/latest/spaces.html",
       "type": "string",
@@ -158,40 +132,6 @@
       "type": "number",
       "default": 0
     },
-
-
-
-    "use_aroma": {
-      "description": "add ICA_AROMA to your preprocessing stream [ default = false ]",
-      "type": "boolean",
-      "default": false
-    },
-    "aroma_melodic_dimensionality": {
-      "description": "Exact or maximum number of MELODIC components to estimate (positive = exact, negative = maximum, default=-200)",
-      "type": "number",
-      "default": -200
-    },
-
-
-
-
-    "return_all_components": {
-      "description": "Include all components estimated in CompCor decomposition in the confounds file instead of only the components sufficient to explain 50 percent of BOLD variance in each CompCor mask [ default = false ]",
-      "type": "boolean",
-      "default": false
-    },
-    "fd_spike_threshold":{
-      "description": "Threshold for flagging a frame as an outlier on the basis of framewise displacement",
-      "default": 0.5,
-      "type": "number"
-    },
-    "dvars_spike_threshold": {
-      "description": "Threshold for flagging a frame as an outlier on the basis of standardised DVARS",
-      "type": "number",
-      "default": 1.5
-    },
-
-
 
     "skull_strip_template": {
       "description": "Possible choices: OASIS30ANTs, NKI. select ANTs skull-stripping template (default: OASIS30ANTs))",
@@ -265,10 +205,22 @@
       "type": "boolean",
       "default": false
     },
+    
     "no_track": {
-      "description": "Opt-out of sending tracking information of this run to the FMRIPREP developers. This information helps to improve FMRIPREP and provides an indicator of real world usage crucial for obtaining funding.",
+      "description": "Opt-out of sending tracking information of this run to the aslprep developers. This information helps to improve aslprep and provides an indicator of real world usage crucial for obtaining funding.",
       "type": "boolean",
       "default": false
+    },
+
+    "dummy_vols": {
+      "description": "Number of initial volumes to ignore  before cbf computation ",
+      "type": "number",
+      "default": "0"
+    },
+    "smooth_kernel": {
+      "description": "Smoothing kernel for the M0 image(s)",
+      "type": "number",
+      "default": "8"
     },
 
 

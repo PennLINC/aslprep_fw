@@ -32,7 +32,7 @@ if outputs:
 
         # logging stuff
         logger.info("=======: fw-heudiconv starting up :=======")
-        logger.info("Copying multi-session fMRIprep run to the project level...")
+        logger.info("Copying multi-session ASLPREP run to the project level...")
 
         inputs_list = []
         try:
@@ -46,7 +46,7 @@ if outputs:
 
             myanalysis = project_container.add_analysis(label = analysis_container.label, inputs = inputs_list)
             myanalysis.add_note(
-                "Copied from a multi-session fMRIprep analysis gear, ID: {}".format(analysis_container.id)
+                "Copied from a multi-session aslprep analysis gear, ID: {}".format(analysis_container.id)
             )
 
             myanalysis.upload_output(["/flywheel/v0/output/" + x for x in outputs])

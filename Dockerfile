@@ -2,11 +2,11 @@
 
 ############################
 # Get the fmriprep algorithm from DockerHub
-FROM poldracklab/fmriprep:20.0.7
+FROM pennlinc/aslprep:0.2.3
 
-MAINTAINER Ted Satterthwaite <sattertt@upenn.edu>
+LABEL Azeez Adebimpe  <adebimpe@upenn.edu>
 
-ENV FMRIPREP_VERSION 20.0.7
+ENV ASLPREP_VERSION 0.2.3
 
 ############################
 # Install basic dependencies
@@ -33,8 +33,8 @@ COPY fs_license.py /flywheel/v0/fs_license.py
 # Set the entrypoint
 ENTRYPOINT ["/flywheel/v0/run"]
 
-# Add the fmriprep dockerfile to the container
-ADD https://raw.githubusercontent.com/poldracklab/fmriprep/${FMRIPREP_VERSION}/Dockerfile ${FLYWHEEL}/fmriprep_${FMRIPREP_VERSION}_Dockerfile
+# Add the aslprep dockerfile to the container
+ADD https://raw.githubusercontent.com/pennlinc/${ASLPREP_VERSION}/Dockerfile ${FLYWHEEL}/aslprep_${ASLPREP_VERSION}_Dockerfile
 
 
 ############################

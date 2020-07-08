@@ -8,8 +8,8 @@ import flywheel
 
 # logging stuff
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('fmriprep-gear')
-logger.info("=======: FMRIPREP :=======")
+logger = logging.getLogger('aslprep-gear')
+logger.info("=======: aslprep :=======")
 
 
 # Gather variables that will be shared across functions
@@ -22,7 +22,7 @@ with flywheel.GearContext() as context:
     ignore = config.get('ignore', '').split()
     analysis_id = context.destination['id']
     gear_output_dir = PosixPath(context.output_dir)
-    fmriprep_script = gear_output_dir / "fmriprep_run.sh"
+    aslprep_script = gear_output_dir / "aslprep_run.sh"
     output_root = gear_output_dir / analysis_id
     working_dir = PosixPath(str(output_root.resolve()) + "_work")
     bids_dir = output_root
@@ -36,23 +36,23 @@ with flywheel.GearContext() as context:
 
     # Flywheel-specific options
     project_label = project_container.label
-    extra_t1 = context.get_input('t1_anatomy')
-    extra_t1_path = None if extra_t1 is None else \
-        PosixPath(context.get_input_path('t1_anatomy'))
-    extra_t2 = context.get_input('t2_anatomy')
-    extra_t2_path = None if extra_t2 is None else \
-        PosixPath(context.get_input_path('t2_anatomy'))
-    use_all_sessions = config.get('use_all_sessions', False)
+    #extra_t1 = context.get_input('t1_anatomy')
+    #extra_t1_path = None if extra_t1 is None else \
+        #PosixPath(context.get_input_path('t1_anatomy'))
+    #extra_t2 = context.get_input('t2_anatomy')
+    #extra_t2_path = None if extra_t2 is None else \
+        #PosixPath(context.get_input_path('t2_anatomy'))
+    #use_all_sessions = config.get('use_all_sessions', False)
 
 
 
-def write_fmriprep_command():
+def write_aslprep_command():
     """Create a command script."""
     with flywheel.GearContext() as context:
 
         # Mandatory arguments
         cmd = [
-            '/usr/local/miniconda/bin/fmriprep',
+            '/usr/local/miniconda/bin/aslprep',
             '--stop-on-first-crash', '-v', '-v',
             str(bids_root),
             str(output_root),
@@ -80,8 +80,6 @@ def write_fmriprep_command():
             cmd += ['--ignore', config.get("ignore")]
         if config.get('longitudinal', False):
             cmd.append('--longitudinal')
-        if config.get('t2s_coreg'):
-            cmd.append('--t2s-coreg')
         if config.get('bold2t1w_dof'):
             cmd += ['--bold2t1w-dof', str(config.get('bold2t1w_dof'))]
         if config.get('force_bbr'):
@@ -89,22 +87,13 @@ def write_fmriprep_command():
         if config.get('force_no_bbr'):
             cmd.append('--force-no-bbr')
         if config.get('dummy_scans'):
-            cmd += ['--dummy-scans', str(config.get('dummy_scans'))]
+            cmd += ['--dummy-scans', str(config.get('dummy_scans'))] 
 
-        # Aroma options
-        if config.get('use_aroma'):
-            cmd.append('--use-aroma')
-            if config.get('aroma_melodic_dimensionality'):
-                cmd += ['--aroma-melodic-dimensionality',
-                        '%d' % config.get('aroma_melodic_dimensionality')]
-
-        # Confounds options
-        if config.get('return_all_components'):
-            cmd.append('--return-all-components')
-        if config.get('fd_spike_threshold'):
-            cmd += ['--fd-spike-threshold', str(config.get('fd_spike_threshold'))]
-        if config.get('dvars_spike_threshold'):
-            cmd += ['--dvars-spike-threshold', str(config.get('dvars_spike_threshold'))]
+        if config.get('dummy_vols'):
+            cmd += ['--dummy-vols', str(config.get('dummy_vols'))]
+        
+        if config.get('smooth_kernel'):
+            cmd += ['--smooth_kernel', str(config.get('smooth_kernel'))]
 
         # Specific options for ANTs registrations
         if config.get('skull_strip_fixed_seed'):
@@ -146,10 +135,10 @@ def write_fmriprep_command():
             cmd.append('--sloppy')
 
     logger.info(' '.join(cmd))
-    with fmriprep_script.open('w') as f:
+    with aslprep_script.open('w') as f:
         f.write(' '.join(cmd))
 
-    return fmriprep_script.exists()
+    return aslprep_script.exists()
 
 
 def get_external_bids(scan_info, local_file):
@@ -198,14 +187,10 @@ def fw_heudiconv_download():
     export.download_bids(fw, downloads, str(bids_dir.resolve()), dry_run=False)
 
     # Download the extra T1w or T2w
-    if extra_t1 is not None:
-        get_external_bids(extra_t1, extra_t1_path)
-    if extra_t2 is not None:
-        get_external_bids(extra_t2, extra_t2_path)
 
-    bold_files = [fname for fname in bids_root.glob("**/*") if "func/" in str(fname)]
-    if not len(bold_files):
-        logger.warning("No BOLD files found in %s", bids_root)
+    perf_files = [fname for fname in bids_root.glob("**/*") if "perf/" in str(fname)]
+    if not len(perf_files):
+        logger.warning("No ASL files found in %s", bids_root)
     return True
 
 
@@ -218,11 +203,11 @@ def main():
         logger.warning("Critical error while trying to download BIDS data.")
         return 1
 
-    command_ok = write_fmriprep_command()
+    command_ok = write_aslprep_command()
     sys.stdout.flush()
     sys.stderr.flush()
     if not command_ok:
-        logger.warning("Critical error while trying to write fmriprep command.")
+        logger.warning("Critical error while trying to write aslprep command.")
         return 1
 
     return 0
