@@ -2,11 +2,11 @@
 
 ############################
 # Get the fmriprep algorithm from DockerHub
-FROM pennlinc/aslprep:0.2.3
+FROM pennlinc/aslprep:0.2.2
 
 LABEL Azeez Adebimpe  <adebimpe@upenn.edu>
 
-ENV ASLPREP_VERSION 0.2.3
+ENV ASLPREP_VERSION 0.2.2
 
 ############################
 # Install basic dependencies
@@ -34,7 +34,7 @@ COPY fs_license.py /flywheel/v0/fs_license.py
 ENTRYPOINT ["/flywheel/v0/run"]
 
 # Add the aslprep dockerfile to the container
-ADD https://raw.githubusercontent.com/pennlinc/${ASLPREP_VERSION}/Dockerfile ${FLYWHEEL}/aslprep_${ASLPREP_VERSION}_Dockerfile
+ADD https://raw.githubusercontent.com/pennlinc/aslprep/${ASLPREP_VERSION}/Dockerfile ${FLYWHEEL}/aslprep_${ASLPREP_VERSION}_Dockerfile
 
 
 ############################
