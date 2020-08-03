@@ -2,7 +2,7 @@
   "name": "aslprep_fw",
   "label": "ASLPREP: A Robust Preprocessing Pipeline for ASL Data",
   "description": " ASLPREP is a robust and easy-to-use pipeline for preprocessing of diverse ASLASLP data.",
-  "author": "PennLINC, Stanford University  University of Pennsylvania",
+  "author": "PennLINC, University of Pennsylvania",
   "maintainer": "Azeez Adebimpe <adebimpe@upenn.edu>",
   "source": "https://github.com/pennlinc/aslprep",
   "url": "https://aslprep.readthedocs.io/en/0.2.3/",
@@ -10,7 +10,7 @@
   "custom": {
     "gear-builder": {
       "category": "analysis",
-      "image": "pennlinc/aslprep_fw:0.0_20.0.5"
+      "image": "pennlinc/aslprep_fw:0.0.1_0.2.3"
     },
     "flywheel":{"suite": "PennBBL"}
   },
@@ -67,7 +67,7 @@
 
     "skip_bids_validation":{
       "description":"skip BIDS validation (NOT RECOMMENDED)",
-      "default": false,
+      "default": true,
       "type": "boolean"
     },
     "task_id":{
@@ -148,8 +148,6 @@
       "default": false
     },
 
-
-
     "fmap_bspline": {
       "description": "fit a B-Spline field using least-squares (experimental)",
       "type": "boolean",
@@ -160,7 +158,6 @@
       "type": "boolean",
       "default": false
     },
-
 
 
     "use_syn_sdc": {
@@ -194,7 +191,6 @@
     },
 
 
-
     "sloppy_mode": {
       "description": "Use low-quality tools for speed - TESTING ONLY",
       "type": "boolean",
@@ -222,8 +218,6 @@
       "type": "number",
       "default": "8"
     },
-
-
 
 
     "timeout":{

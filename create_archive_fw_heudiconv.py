@@ -80,7 +80,7 @@ logger.info("Dry run: {}".format(dry_run))
 
 # action
 if action == "Curate":
-    print("fMRIPREP isn't designed for BIDS Curation!")
+    print("ASLPREP isn't designed for BIDS Curation!")
     #curate.convert_to_bids(fw, project_label, heuristic, subjects, sessions, dry_run=dry_run)
 
 elif action == "Export":
@@ -151,7 +151,7 @@ elif action == "Export":
         #         shutil.rmtree(x)
 
 elif action == "Tabulate":
-    print("fMRIPREP isn't designed for BIDS Tabulation!")
+    print("ASLPREP isn't designed for BIDS Tabulation!")
     #tabulate.tabulate_bids(fw, project_label, "/flywheel/v0/output", subjects, sessions, dry_run=dry_run)
 
 else:

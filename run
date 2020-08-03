@@ -48,7 +48,7 @@ if [[ ! -f $EXE_SCRIPT ]]; then
   exit 1
 fi
 
-# RUN QSIPREP
+# RUN ASLPREP
 export NODE_OPTIONS="--max-old-space-size=6000"
 timeout ${timeout_days}d bash /flywheel/v0/output/aslprep_run.sh
 

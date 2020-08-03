@@ -2,11 +2,11 @@
 
 ############################
 # Get the fmriprep algorithm from DockerHub
-FROM pennlinc/aslprep:0.2.2
+FROM pennlinc/aslprep:0.2.3
 
 LABEL Azeez Adebimpe  <adebimpe@upenn.edu>
 
-ENV ASLPREP_VERSION 0.2.2
+ENV ASLPREP_VERSION 0.2.3
 
 ############################
 # Install basic dependencies
