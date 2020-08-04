@@ -34,15 +34,15 @@ with flywheel.GearContext() as context:
     session_container = fw.get(analysis_container.parent['id'])
     subject_container = fw.get(session_container.parents['subject'])
 
-    # Flywheel-specific options
+    ## Flywheel-specific options
     project_label = project_container.label
-    #extra_t1 = context.get_input('t1_anatomy')
-    #extra_t1_path = None if extra_t1 is None else \
-        #PosixPath(context.get_input_path('t1_anatomy'))
-    #extra_t2 = context.get_input('t2_anatomy')
-    #extra_t2_path = None if extra_t2 is None else \
-        #PosixPath(context.get_input_path('t2_anatomy'))
-    #use_all_sessions = config.get('use_all_sessions', False)
+    extra_t1 = context.get_input('t1_anatomy')
+    extra_t1_path = None if extra_t1 is None else \
+        PosixPath(context.get_input_path('t1_anatomy'))
+    extra_t2 = context.get_input('t2_anatomy')
+    extra_t2_path = None if extra_t2 is None else \
+        PosixPath(context.get_input_path('t2_anatomy'))
+    use_all_sessions = config.get('use_all_sessions', False)
 
 
 
